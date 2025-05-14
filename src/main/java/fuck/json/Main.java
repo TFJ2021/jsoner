@@ -1,31 +1,35 @@
 package fuck.json;
 
-import fuck.json.JsonStuff.JsonConfig;
-import fuck.json.JsonStuff.JsonCreator;
-
 public class Main {
 
-    /**
-     * Funktioniert soweit :D
-     * Ich will den Code aber noch sotieren und erweitern.
-     * Code kommentieren
-     * Read Me hinzufügen.
-     * Eigenes Map System schreiben
-     */
-
     public static void main(String[] args) {
-        System.out.println("--==#==--");
+        TheJsonCreator jsonCreator = new TheJsonCreator();
 
-        // JsonCreator jsonCreator = new JsonCreator("lel/config.json", "configs/config.json");
-        JsonCreator jsonCreator = new JsonCreator("configs/config.json");
-        JsonConfig config = jsonCreator.getConfig();
-        System.out.println(config.getString("botToken"));
-        config.set("botToken", "ohha");
-        System.out.println(config.getString("hehe.moin"));
-        config.save();
+        // TODO | Add Examples
+        /*
+            JsonEntity cfg = new JsonEntity(new File("config.json"));
 
-        System.out.println(config.getString("botToken", "not found"));
-        // WORKS!!!!! So far :DDD
+            // existierend: liefert "001"
+            String stickerId = cfg.get("stickers.lol", String.class, "default");
+            System.out.println("stickerId = " + stickerId);
 
+            PersonEntity sticker = cfg.get("da", PersonEntity.class, new PersonEntity());
+            System.out.println("stickerId = " + sticker.getId());
+
+            sticker.setDisplay("Uiii");
+            cfg.set("botToken", ":D");
+
+            // nicht existierend: liefert Fallback
+            String foo = cfg.get("foo.bar", String.class, "nicht gefunden");
+            System.out.println("foo.bar = " + foo);
+
+            // ändern und speichern:
+            cfg.getRoot()
+                    .getAsJsonObject("stickers")
+                    .addProperty("lol", "999");
+            cfg.save();
+            System.out.println("Saved new sticker.lol = " + cfg.get("stickers.lol", String.class, "x"));
+
+         */
     }
 }
