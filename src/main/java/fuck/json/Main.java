@@ -21,7 +21,7 @@ public class Main {
         JsonConfig config = jsonCreator.getConfig();
         System.out.println(config.getString("botToken"));
         config.set("botToken", "ohha");
-        System.out.println(config.getString("botToken"));
+        System.out.println(config.getString("hehe.moin"));
         config.save();
 
         System.out.println(config.getString("botToken", "not found"));

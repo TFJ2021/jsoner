@@ -11,6 +11,11 @@ import java.nio.file.StandardCopyOption;
 @SuppressWarnings("ALL")
 public class JsonCreator {
 
+    /**
+     * <h1>Jsoner</h1>
+     * by TFJ - MIT license [https://github.com/TFJ2021/jsoner]
+     */
+
     private File file;
     private JsonConfig config;
 
