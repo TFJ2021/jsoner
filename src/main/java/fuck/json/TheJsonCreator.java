@@ -141,6 +141,62 @@ public class TheJsonCreator {
         return get(path, clazz, null);
     }
 
+    // Strings
+    public String getString(String path, String fallback) {
+        return get(path, String.class, fallback);
+    }
+    public String getString(String path) {
+        return getString(path, null);
+    }
+
+    // Boolean
+    public boolean getBoolean(String path, boolean fallback) {
+        return get(path, Boolean.class, fallback);
+    }
+    public boolean getBoolean(String path) {
+        return getBoolean(path, false);
+    }
+
+    // Byte
+    public int getByte(String path, byte fallback) {
+        return get(path, Byte.class, fallback);
+    }
+    public int getByte(String path) {
+        return getByte(path, (byte) 0);
+    }
+
+    // Integer
+    public int getInteger(String path, int fallback) {
+        return get(path, Integer.class, fallback);
+    }
+    public int getInteger(String path) {
+        return getInteger(path, 0);
+    }
+
+    // Long
+    public long getLong(String path, long fallback) {
+        return get(path, Long.class, fallback);
+    }
+    public long getLong(String path) {
+        return getLong(path, 0L);
+    }
+
+    // Float
+    public float getFloat(String path, float fallback) {
+        return get(path, Float.class, fallback);
+    }
+    public float getFloat(String path) {
+        return getFloat(path, 0f);
+    }
+
+    // Double
+    public double getDouble(String path, double fallback) {
+        return get(path, Double.class, fallback);
+    }
+    public double getDouble(String path) {
+        return getDouble(path, 0d);
+    }
+
     /**
      * Traverses the JSON structure according to dot notation.
      */
