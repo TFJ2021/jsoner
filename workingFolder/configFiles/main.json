@@ -1,0 +1,8 @@
+{
+  "botToken": "xxx",
+  "person": {
+    "id": "001",
+    "name": "Cat",
+    "age": 16
+  }
+}

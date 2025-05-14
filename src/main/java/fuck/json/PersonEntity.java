@@ -3,7 +3,8 @@ package fuck.json;
 public class PersonEntity {
 
     private String id;
-    private String display;
+    private String name;
+    private int age;
 
     public String getId() {
         return id;
@@ -12,12 +13,17 @@ public class PersonEntity {
         this.id = id;
     }
 
-    public String getDisplay() {
-        return display;
+    public String getName() {
+        return name;
     }
-    public void setDisplay(String display) {
-        this.display = display;
+    public void setName(String name) {
+        this.name = name;
     }
 
-
+    public int getAge() {
+        return age;
+    }
+    public void setAge(int age) {
+        this.age = age;
+    }
 }

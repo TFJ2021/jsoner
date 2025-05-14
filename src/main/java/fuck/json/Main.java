@@ -3,32 +3,24 @@ package fuck.json;
 public class Main {
 
     public static void main(String[] args) {
-        TheJsonCreator jsonCreator = new TheJsonCreator();
+        TheJsonCreator jsonCreator = new TheJsonCreator("configs/config.json", "configFiles/main.json");
 
-        // TODO | Add Examples
+        // exists: xxx
+        String botToken = jsonCreator.getString("botToken","UNKNOWN");
+        System.out.println("botToken = " + botToken);
+
+        // doesnt exist: ??? = fallback
+        String apiKey = jsonCreator.getString("apiKey", "???");
+        System.out.println("apiKey = " + apiKey);
+
+        // TODO | Finish examples
         /*
-            JsonEntity cfg = new JsonEntity(new File("config.json"));
-
-            // existierend: liefert "001"
-            String stickerId = cfg.get("stickers.lol", String.class, "default");
-            System.out.println("stickerId = " + stickerId);
-
-            PersonEntity sticker = cfg.get("da", PersonEntity.class, new PersonEntity());
-            System.out.println("stickerId = " + sticker.getId());
-
-            sticker.setDisplay("Uiii");
-            cfg.set("botToken", ":D");
-
-            // nicht existierend: liefert Fallback
-            String foo = cfg.get("foo.bar", String.class, "nicht gefunden");
-            System.out.println("foo.bar = " + foo);
-
-            // ändern und speichern:
-            cfg.getRoot()
-                    .getAsJsonObject("stickers")
-                    .addProperty("lol", "999");
-            cfg.save();
-            System.out.println("Saved new sticker.lol = " + cfg.get("stickers.lol", String.class, "x"));
+        // ändern und speichern:
+        cfg.getRoot()
+                .getAsJsonObject("stickers")
+                .addProperty("lol", "999");
+        cfg.save();
+        System.out.println("Saved new sticker.lol = " + cfg.get("stickers.lol", String.class, "x"));
 
          */
     }
