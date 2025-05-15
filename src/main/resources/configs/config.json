@@ -1,8 +1,37 @@
 {
-  "botToken": "xxx",
+  "botToken": "It´s a secret",
   "person": {
     "id": "001",
     "name": "Cat",
     "age": 16
-  }
+  },
+  "timesStarted": 0,
+  "classes": {
+    "1a": {
+      "teacher": "Mr Unknown",
+      "room": "R001"
+    },
+    "2a": {
+      "teacher": "Ms Unknown",
+      "room": "R002"
+    }
+  },
+  "bestClasses": [
+    {
+      "teacher": "Mr Unknown",
+      "room": "R001"
+    },
+    {
+      "teacher": "Ms Unknown",
+      "room": "R002"
+    }
+  ],
+  "grades": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ]
 }

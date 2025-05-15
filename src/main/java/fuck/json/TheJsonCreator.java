@@ -7,11 +7,14 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class TheJsonCreator {
 
     /**
-     * <h1>Jsoner</h1>
+     * <h1>Jsoner [v1.0]</h1>
      * by TFJ - MIT license <br><a href="https://github.com/TFJ2021/jsoner">Github Link</a>
      */
 
@@ -107,17 +110,46 @@ public class TheJsonCreator {
      */
     public void save() {
         try {
-            FileWriter fw = new FileWriter(file);
-            BufferedWriter bw = new BufferedWriter(fw);
-            gson.toJson(root, bw);
-        } catch (IOException | JsonIOException e) {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(gson.toJson(root));
+            writer.close();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
+     * Sets a new Value
+     *
+     * @param path Path in the format "object.subobject.field"
+     * @param value New value (any type, serialized via Gson)
+     * @param <T> Value type
+     */
+    public <T> void set(String path, T value) {
+        String[] parts = path.split("\\.");
+        JsonObject current = root;
+        int i = 0;
+        // Loops through to the second to last path element, creating missing objects
+        for (String key : parts) {
+            if (parts.length - 1 == i) break;
+            JsonElement child = current.get(key);
+            if (!(child == null || !child.isJsonObject())) current = child.getAsJsonObject();
+            else {
+                JsonObject obj = new JsonObject();
+                current.add(key, obj);
+                current = obj;
+            }
+            i++;
+        }
+
+        // Last element: sets the value
+        String lastKey = parts[parts.length - 1];
+        JsonElement jsonValue = gson.toJsonTree(value);
+        current.add(lastKey, jsonValue);
+    }
+
+    /**
      * Reads a value using a "dot" path, casts it to clazz, or returns the fallback.
-     * Example: get("hashedAPIKey", String.class, "xxx")
      *
      * @param path Path in the format "object.subobject.field"
      * @param clazz Target class
@@ -197,6 +229,12 @@ public class TheJsonCreator {
         return getDouble(path, 0d);
     }
 
+    // List
+    // WARNING: Currently, only strings are fully supported.
+    public <T> List<T> getList(String path, List<T> sd) {
+        return get(path, sd.getClass(), null);
+    }
+
     /**
      * Traverses the JSON structure according to dot notation.
      */
@@ -204,38 +242,33 @@ public class TheJsonCreator {
         String[] parts = path.split("\\.");
         JsonElement current = root;
         for (String p : parts) {
-            if (current == null || !current.isJsonObject()) {
-                return null;
-            }
+            if (current == null || !current.isJsonObject()) return null;
             current = current.getAsJsonObject().get(p);
         }
         return current;
     }
 
     /**
-     * Sets a new Value
+     * Returns all keys below a given path.
      *
-     * @param path Path in the format "object.subobject.field"
-     * @param value New value (any type, serialized via Gson)
-     * @param <T> Value type
+     * @param path The path. "" for all Keys
+     * @param deep true = recursive (all subkeys), false = direct keys only
+     * @return The requested keys as List< String>
      */
-    public <T> void set(String path, T value) {
-        String[] parts = path.split("\\.");
-        JsonObject current = root;
-        // Loops through to the second to last path element, creating missing objects
-        for (String key : parts) {
-            JsonElement child = current.get(key);
-            if (!(child == null || !child.isJsonObject())) current = child.getAsJsonObject();
-            else {
-                JsonObject obj = new JsonObject();
-                current.add(key, obj);
-                current = obj;
-            }
-        }
+    public List<String> getKeys(String path, boolean deep) {
+        List<String> keys = new ArrayList<>();
+        JsonElement node = path.isEmpty() ? root : traverse(path);
+        if (node == null || !node.isJsonObject()) return keys;
+        collectKeys(node.getAsJsonObject(), "", deep, keys);
+        return keys;
+    }
 
-        // Last element: sets the value
-        String lastKey = parts[parts.length - 1];
-        JsonElement jsonValue = gson.toJsonTree(value);
-        current.add(lastKey, jsonValue);
+    // Helper methode
+    private void collectKeys(JsonObject obj, String prefix, boolean deep, List<String> keys) {
+        for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
+            String fullKey = prefix.isEmpty() ? entry.getKey() : prefix + "." + entry.getKey();
+            keys.add(fullKey);
+            if (deep && entry.getValue().isJsonObject()) collectKeys(entry.getValue().getAsJsonObject(), fullKey, true, keys);
+        }
     }
 }
