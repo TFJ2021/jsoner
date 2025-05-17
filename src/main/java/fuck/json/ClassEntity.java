@@ -18,4 +18,9 @@ public class ClassEntity {
     public void setRoom(String room) {
         this.room = room;
     }
+
+    @Override
+    public String toString() {
+        return getTeacher() + " - " + getRoom();
+    }
 }

@@ -14,13 +14,13 @@ import java.util.Map;
 public class TheJsonCreator {
 
     /**
-     * <h1>Jsoner [v1.0]</h1>
+     * <h1>Jsoner [v1.1]</h1>
      * by TFJ - MIT license <br><a href="https://github.com/TFJ2021/jsoner">Github Link</a>
      */
 
     private File file;
     private Gson gson;
-    private JsonObject root;
+    private JsonElement root;
 
     /**
      * Creates new JsonCreator with a brand-new file
@@ -42,7 +42,7 @@ public class TheJsonCreator {
                 throw new RuntimeException(e);
             }
 
-            // Fills in the new file
+            // Inserts content into the new file.
             try {
                 InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
                 if (inputStream == null) throw new FileNotFoundException();
@@ -65,13 +65,7 @@ public class TheJsonCreator {
      */
     public TheJsonCreator(String targetPath) {
         File file = new File(targetPath);
-        if (!file.exists()) {
-            try {
-                throw new FileNotFoundException();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        if (!file.exists()) throw new RuntimeException(new FileNotFoundException());
 
         // The main startup
         startUp(file);
@@ -98,7 +92,9 @@ public class TheJsonCreator {
             FileReader fr = new FileReader(file);
             JsonReader jr = new JsonReader(fr);
             JsonElement parsed = JsonParser.parseReader(jr);
-            if (parsed != null && parsed.isJsonObject()) root = parsed.getAsJsonObject();
+            if (parsed == null) root = new JsonObject(); // root is null
+            else if (parsed.isJsonObject()) root = parsed.getAsJsonObject();
+            else if (parsed.isJsonArray()) root = parsed.getAsJsonArray();
             else root = new JsonObject(); // empty object if the file is empty or no object
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -121,40 +117,51 @@ public class TheJsonCreator {
     /**
      * Sets a new Value
      *
-     * @param path Path in the format "object.subobject.field"
+     * @param path Path in the format "object.subobject.field". Cannot be null
      * @param value New value (any type, serialized via Gson)
      * @param <T> Value type
+     * @throws IllegalArgumentException when the path is null
      */
     public <T> void set(String path, T value) {
-        String[] parts = path.split("\\.");
-        JsonObject current = root;
-        int i = 0;
-        // Loops through to the second to last path element, creating missing objects
-        for (String key : parts) {
-            if (parts.length - 1 == i) break;
-            JsonElement child = current.get(key);
-            if (!(child == null || !child.isJsonObject())) current = child.getAsJsonObject();
-            else {
-                JsonObject obj = new JsonObject();
-                current.add(key, obj);
-                current = obj;
-            }
-            i++;
+        if (path == null) throw new RuntimeException(new IllegalArgumentException());
+        JsonElement jsonValue = gson.toJsonTree(value);
+
+        // Case 1: Set root
+        if (path.isEmpty()) {
+            this.root = jsonValue;
+            return;
         }
 
-        // Last element: sets the value
+        // Case 2: Root must be objected for nested keys
+        if (!(root != null && root.isJsonObject())) throw new IllegalStateException("Root is not a JSON object – cannot be set with path");
+
+        String[] parts = path.split("\\.");
+        JsonObject current = root.getAsJsonObject();
+        for (int i = 0; i < parts.length - 1; i++) {
+            String key = parts[i];
+            JsonElement child = current.get(key);
+
+            if (child != null && child.isJsonObject()) current = child.getAsJsonObject();
+            else {
+                JsonObject newObj = new JsonObject();
+                current.add(key, newObj);
+                current = newObj;
+            }
+        }
+
+        // Letzter Key: Setzen
         String lastKey = parts[parts.length - 1];
-        JsonElement jsonValue = gson.toJsonTree(value);
         current.add(lastKey, jsonValue);
     }
 
+
     /**
      * Reads a value using a "dot" path, casts it to clazz, or returns the fallback.
+     * WARNING: It's not possible to set to root!
      *
      * @param path Path in the format "object.subobject.field"
-     * @param clazz Target class
+     * @param clazz Target Typ
      * @param fallback Fallback-Value
-     * @param <T> Typ
      * @return Value or fallback
      */
     public <T> T get(String path, Class<T> clazz, T fallback) {
@@ -229,21 +236,46 @@ public class TheJsonCreator {
         return getDouble(path, 0d);
     }
 
-    // List
-    // WARNING: Currently, only strings are fully supported.
-    public <T> List<T> getList(String path, List<T> sd) {
-        return get(path, sd.getClass(), null);
+    /**
+     * Reads a value using a "dot" path, casts it to clazz, or returns the fallback.
+     *
+     * @param path Path in the format "object.subobject.field"
+     * @param clazz List Typ
+     * @param fallback Fallback-Value
+     * @return List or fallback
+     * @apiNote It's not possible to set to root!
+     */
+    public <T> List<T> getList(String path, Class<T> clazz, List<T> fallback) {
+        JsonElement node = traverse(path);
+        if (node == null || node.isJsonNull()) return fallback;
+
+        try {
+            JsonArray arr = node.getAsJsonArray();
+            List<T> result = new ArrayList<>();
+            for (JsonElement elem : arr) result.add(gson.fromJson(elem, clazz));
+            return result;
+        } catch (Exception e) {
+            return fallback;
+        }
+    }
+
+    public <T> List<T> getList(String path, Class<T> clazz) {
+        return getList(path, clazz, null);
     }
 
     /**
      * Traverses the JSON structure according to dot notation.
      */
     private JsonElement traverse(String path) {
+        if (path == null) throw new RuntimeException(new IllegalArgumentException());
+        if (path.isEmpty()) return root;
+
         String[] parts = path.split("\\.");
         JsonElement current = root;
-        for (String p : parts) {
+
+        for (String part : parts) {
             if (current == null || !current.isJsonObject()) return null;
-            current = current.getAsJsonObject().get(p);
+            current = current.getAsJsonObject().get(part);
         }
         return current;
     }
@@ -256,9 +288,10 @@ public class TheJsonCreator {
      * @return The requested keys as List< String>
      */
     public List<String> getKeys(String path, boolean deep) {
+        if (path == null) throw new RuntimeException(new IllegalArgumentException());
         List<String> keys = new ArrayList<>();
-        JsonElement node = path.isEmpty() ? root : traverse(path);
-        if (node == null || !node.isJsonObject()) return keys;
+        JsonElement node = traverse(path);
+        if (node == null || !node.isJsonObject()) return keys; // Not found
         collectKeys(node.getAsJsonObject(), "", deep, keys);
         return keys;
     }

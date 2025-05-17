@@ -15,18 +15,22 @@
 
 
 ## 🧾 License
-₪ This project is licend under MIT license - The comment at the top of the JsonCreator file is enough for me
+₪ This project is licensed under MIT license - The comment at the top of the JsonCreator file is enough for me
 
 
 ## 🕐 Current Version
-₪ 1.0 - released 15.05.2025
+₪ 1.1 - released 17.05.2025
+
+〢 1.0 - released 15.05.2025
 
 ## ⚙ Usage
-₪ Copy TheJsonCreator File into your own project
+₪ Many examples of how the API can/should be used can be found in the main file
 
-₪ ```new TheJsonCreator(targetPath)``` or ```new TheJsonCreator(resourcePath, targetPath)```
+₪ 1. Copy TheJsonCreator File into your own project
 
-₪ many examples can be found in the Main file ;)
+₪ 2. ```new TheJsonCreator(targetPath)``` or ```new TheJsonCreator(resourcePath, targetPath)```
+
+₪ 3. I hope the rest is self-explanatory
 
 
 ## ❤ Helpful?
