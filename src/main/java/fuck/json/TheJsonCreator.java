@@ -33,7 +33,7 @@ public class TheJsonCreator {
         File directory = file.getParentFile();
         if (!file.exists()) {
             // Creates Directory
-            if (!directory.exists()) directory.mkdirs();
+            if (directory != null && !directory.exists()) directory.mkdirs();
 
             // Creates File
             try {
