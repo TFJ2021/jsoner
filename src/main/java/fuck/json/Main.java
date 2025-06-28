@@ -1,5 +1,6 @@
 package fuck.json;
 
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ public class Main {
         String botToken = jsonCreator.getString("botToken","UNKNOWN");
         System.out.println("botToken = " + botToken);
 
-        // doesnt exist: ??? = fallback
+        // doesn't exist: ??? = fallback
         String apiKey = jsonCreator.getString("apiKey", "???");
         System.out.println("apiKey = " + apiKey);
 
@@ -52,14 +53,38 @@ public class Main {
         // This throws an exception because the file doesn't exist
         try {
             TheJsonCreator classes = new TheJsonCreator("configFiles/clas.json");
-        } catch (RuntimeException ignored) {}
+        } catch (RuntimeException ignored) {
+            System.out.println("[!] Json File not found");
+        }
 
-        // List only files are also supported
+        // Lists are also supported
         TheJsonCreator classes = new TheJsonCreator("configFiles/classes.json");
         List<ClassEntity> list = classes.getList("", ClassEntity.class);
         System.out.println(list);
-        list.get(0).setRoom("Admin");
+        list.getFirst().setRoom("Toilet");
         classes.set("", list);
         classes.save();
+
+        // Create JsonCreator by a String (Helpful for API responses)
+        TheJsonCreator theJsonStringEntity = new TheJsonCreator(jsonString, (File) null);
+        System.out.println("Made by " + theJsonStringEntity.getString("global_name") + " [" + theJsonStringEntity.getString("clan.tag") + "]");
     }
+
+    // An example of an API (Discord to be exact)
+    private static final String jsonString = """
+            {
+              "id": "852576677573296179",
+              "username": "tfj_5183",
+              "banner": null,
+              "accent_color": 1118740,
+              "global_name": "TFJ",
+              "banner_color": "#111214",
+              "clan": {
+                "identity_guild_id": "428823240824061954",
+                "identity_enabled": true,
+                "tag": "2077",
+                "badge": "bdf7998de2b7f8d2153aa572b8cf2e82"
+              }
+            }
+            """;
 }

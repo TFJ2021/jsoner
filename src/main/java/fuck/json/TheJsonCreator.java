@@ -14,8 +14,8 @@ import java.util.Map;
 public class TheJsonCreator {
 
     /**
-     * <h1>Jsoner [v1.1]</h1>
-     * by TFJ - MIT license <br><a href="https://github.com/TFJ2021/jsoner">Github Link</a>
+     * <h1>Jsoner [v1.2]</h1>
+     * by TFJ - MIT license <br><a href="https://github.com/TFJ2021/jsoner">GitHub Link</a>
      */
 
     private File file;
@@ -72,22 +72,50 @@ public class TheJsonCreator {
     }
 
     /**
+     * Uses a string in Json format for the creator
+     *
+     * @param json The json as String
+     * @param file (Nullable) To which file the content should be saved with save()
+     */
+    public TheJsonCreator(String json, File file) {
+        // The main startup
+        startUp(json, file);
+    }
+
+    /**
      * Starts the main loading part
      *
      * @param file The file that should be loaded
      */
     private void startUp(File file) {
+        settings(file);
+        reload();
+    }
+
+    private void startUp(String json, File file) {
+        settings(file);
+        reload(json);
+    }
+
+    /**
+     * Sets file and new gson
+     *
+     * @param file The main file
+     */
+    private void settings(File file) {
         this.file = file;
         this.gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();
-        reload();
     }
 
     /**
      * (Re-)loads the File and sets the root
      */
     public void reload() {
+        // Checks whether a file has been deposited
+        if (file == null) throw new RuntimeException(new FileNotFoundException("No file has been deposited"));
+
         try {
             FileReader fr = new FileReader(file);
             JsonReader jr = new JsonReader(fr);
@@ -102,9 +130,25 @@ public class TheJsonCreator {
     }
 
     /**
+     * Parses the string as JSON
+     */
+    private void reload(String content) {
+        StringReader sr = new StringReader(content);
+        JsonReader jr = new JsonReader(sr);
+        JsonElement parsed = JsonParser.parseReader(jr);
+        if (parsed == null) root = new JsonObject(); // root is null
+        else if (parsed.isJsonObject()) root = parsed.getAsJsonObject();
+        else if (parsed.isJsonArray()) root = parsed.getAsJsonArray();
+        else root = new JsonObject(); // empty object if the file is empty or no object
+    }
+
+    /**
      * Saves the current state back to the JSON file.
      */
     public void save() {
+        // Checks whether a file has been deposited
+        if (file == null) throw new RuntimeException(new FileNotFoundException("No file has been deposited"));
+
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             writer.write(gson.toJson(root));
@@ -149,7 +193,7 @@ public class TheJsonCreator {
             }
         }
 
-        // Letzter Key: Setzen
+        // Last Key: Set
         String lastKey = parts[parts.length - 1];
         current.add(lastKey, jsonValue);
     }
@@ -157,7 +201,6 @@ public class TheJsonCreator {
 
     /**
      * Reads a value using a "dot" path, casts it to clazz, or returns the fallback.
-     * WARNING: It's not possible to set to root!
      *
      * @param path Path in the format "object.subobject.field"
      * @param clazz Target Typ
@@ -237,13 +280,12 @@ public class TheJsonCreator {
     }
 
     /**
-     * Reads a value using a "dot" path, casts it to clazz, or returns the fallback.
+     * Gets a list
      *
      * @param path Path in the format "object.subobject.field"
      * @param clazz List Typ
      * @param fallback Fallback-Value
      * @return List or fallback
-     * @apiNote It's not possible to set to root!
      */
     public <T> List<T> getList(String path, Class<T> clazz, List<T> fallback) {
         JsonElement node = traverse(path);
@@ -283,7 +325,7 @@ public class TheJsonCreator {
     /**
      * Returns all keys below a given path.
      *
-     * @param path The path. "" for all Keys
+     * @param path Path in the format "object.subobject.field"
      * @param deep true = recursive (all subkeys), false = direct keys only
      * @return The requested keys as List< String>
      */
