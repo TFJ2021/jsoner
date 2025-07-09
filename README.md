@@ -19,7 +19,9 @@
 
 
 ## 🕐 Current Version
-₪ 1.2 - released 28.06.2025
+₪ 1.2.1 - released 09.07.2025
+
+〢 1.2 - released 28.06.2025
 
 〢 1.1 - released 17.05.2025
 

@@ -68,6 +68,9 @@ public class Main {
         // Create JsonCreator by a String (Helpful for API responses)
         TheJsonCreator theJsonStringEntity = new TheJsonCreator(jsonString, (File) null);
         System.out.println("Made by " + theJsonStringEntity.getString("global_name") + " [" + theJsonStringEntity.getString("clan.tag") + "]");
+
+        // You can output the class/entity as JSON
+        System.out.println(theJsonStringEntity.toString());
     }
 
     // An example of an API (Discord to be exact)

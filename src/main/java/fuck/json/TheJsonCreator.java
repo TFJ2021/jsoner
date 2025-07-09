@@ -14,7 +14,7 @@ import java.util.Map;
 public class TheJsonCreator {
 
     /**
-     * <h1>Jsoner [v1.2]</h1>
+     * <h1>Jsoner [v1.2.1]</h1>
      * by TFJ - MIT license <br><a href="https://github.com/TFJ2021/jsoner">GitHub Link</a>
      */
 
@@ -151,7 +151,7 @@ public class TheJsonCreator {
 
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(gson.toJson(root));
+            writer.write(toJson());
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -345,5 +345,16 @@ public class TheJsonCreator {
             keys.add(fullKey);
             if (deep && entry.getValue().isJsonObject()) collectKeys(entry.getValue().getAsJsonObject(), fullKey, true, keys);
         }
+    }
+
+    // Returns the class as JSON
+    public String toJson() {
+        return gson.toJson(root);
+    }
+
+    // Just look at toJson()
+    @Override
+    public String toString() {
+        return toJson();
     }
 }
